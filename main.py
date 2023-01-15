@@ -7,17 +7,20 @@ import ccxt
 class MainApp(QMainWindow):
     def __init__(self, parent=None, *args):
         super(MainApp, self).__init__(parent=parent)
-        self.setFixedSize(300,300)
+        self.setFixedSize(250,300)
         self.setWindowTitle("Precio BTC")
         self.price = None
-        self.label = QLabel("Precio: ${}".format(self.price))
+        self.label = QLabel("BTC: ${}".format(self.price))
         self.label.setAlignment(Qt.AlignCenter)
-        self.label.setFont(QFont("Arial", 20))
-        self.label.setStyleSheet("color: #fff; background-color: #424242;")
+        self.label.setFont(QFont("Script a", 20))
+        self.label.setStyleSheet("color: #fff; background-color: #1f6764; border: none; border-radius: 6px;")
         self.update_price() # Call the update_price method to set the initial label text
 
         self.update_button = QPushButton("Actualizar", self)
         self.update_button.clicked.connect(self.update_price)
+        self.update_button.setFixedSize(280, 40)
+        self.update_button.setObjectName("update-button")
+        self.update_button.setStyleSheet("background-color: rgba(23, 26, 32, 0.8);  border: none; border-radius: 6px; color: #fff; font-family: SFProText-Regular, Helvetica, Arial, sans-serif; font-size: 15px; height: 36px; line-height: 20px; margin-left: 8px; margin-right: 6px; min-width: 185px; padding: 0 16px 0 16px; color:white;")
 
         layout = QVBoxLayout()
         layout.addWidget(self.label)
@@ -39,7 +42,7 @@ class MainApp(QMainWindow):
         except Exception as e:
             print(e)
             self.price = "No disponible"
-        self.label.setText("Precio: ${}".format(self.price))
+        self.label.setText("BTC: ${}".format(self.price))
 
 if __name__ == "__main__":
     app = QApplication([])
