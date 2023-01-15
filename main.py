@@ -1,51 +1,48 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
-from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 import ccxt
-from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QProgressBar
-from PyQt5.QtWidgets import QVBoxLayout
 
+class MainApp(QMainWindow):
+    def __init__(self, parent=None, *args):
+        super(MainApp, self).__init__(parent=parent)
+        self.setFixedSize(300,300)
+        self.setWindowTitle("Precio BTC")
+        self.price = None
+        self.label = QLabel("Precio: ${}".format(self.price))
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setFont(QFont("Arial", 20))
+        self.label.setStyleSheet("color: #fff; background-color: #424242;")
+        self.update_price() # Call the update_price method to set the initial label text
 
-price = None
+        self.update_button = QPushButton("Actualizar", self)
+        self.update_button.clicked.connect(self.update_price)
 
+        layout = QVBoxLayout()
+        layout.addWidget(self.label)
+        layout.addWidget(self.update_button)
+        central_widget = QWidget()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
+        self.show()
 
-def update_price():
-    global price
-    progress_bar.setValue(0)
-    progress_bar.show()
-    try:
-        exchange = ccxt.binance()
-        price = exchange.fetch_ticker('BTC/USDT')['last']
-    except:
-       price = "No disponible"
-    label.setText("Precio: ${}".format(price))
-    progress_bar.setValue(100)
-    progress_bar.hide()
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_price)
+        self.timer.start(60000) # actualiza cada minuto
 
-app = QApplication(sys.argv)
-window = QMainWindow()
-v_layout = QVBoxLayout()
-label = QLabel("Precio: ${}".format(price))
-window.setCentralWidget(label)
-label.move(10, 10)
-refresh_button = QPushButton("Actualizar precio", window)
-v_layout.addWidget(label)
-v_layout.addWidget(refresh_button)
+    def update_price(self):
+        try:
+            exchange = ccxt.binance()
+            self.price = exchange.fetch_ticker('BTC/USDT')['last']
+            print(self.price)
+        except Exception as e:
+            print(e)
+            self.price = "No disponible"
+        self.label.setText("Precio: ${}".format(self.price))
 
-refresh_button.clicked.connect(update_price)
-progress_bar = QProgressBar(window)
-progress_bar.setRange(0, 100)
-progress_bar.setValue(0)
-progress_bar.move(10, 40)
-window.setLayout(v_layout)
-window.show()
-label.repaint()
-update_price()
-
-
-timer = QTimer()
-timer.timeout.connect(update_price)
-timer.start(60000)
-
-sys.exit(app.exec_())
+if __name__ == "__main__":
+    app = QApplication([])
+    window = MainApp()
+    window.show()
+    sys.exit(app.exec_())
